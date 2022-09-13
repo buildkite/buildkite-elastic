@@ -63,6 +63,7 @@ Metadata:
         - ImageIdParameter
         - InstanceOperatingSystem
         - InstanceType
+        - CpuCredits
         - EnableInstanceStorage
         - AgentsPerInstance
         - KeyName
@@ -262,6 +263,13 @@ Parameters:
     MinLength: 1
     AllowedPattern: "^[\\w\\.]+(,[\\w\\.]*){0,3}$"
     ConstraintDescription: "must contain 1-4 instance types separated by commas. No space before/after the comma."
+
+  CpuCredits:
+    Description: Credit option for CPU usage of the instance.
+    AllowedValues:
+      - standard
+      - unlimited
+    Default: "unlimited"
 
   SpotPrice:
     Description: Maximum spot price to use for the instances, in instance cost per hour. Values >0 will result in 100% of instances being spot. 0 means only use normal (non-spot) instances. This parameter is deprecated - we recommend setting to 0 and using OnDemandPercentage to opt into spot instances.
@@ -976,6 +984,8 @@ Resources:
           BlockDeviceMappings:
             - DeviceName: !If [ UseDefaultRootVolumeName, !If [ UseWindowsAgents, /dev/sda1, /dev/xvda ], !Ref RootVolumeName ]
               Ebs: { VolumeSize: !Ref RootVolumeSize, VolumeType: !Ref RootVolumeType }
+          CreditSpecification:
+            CpuCredits: !Ref CpuCredits
           TagSpecifications:
             - ResourceType: instance
               Tags:
